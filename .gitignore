@@ -1,5 +1,8 @@
-# Ignore archives
+# Archived files
 archives/
+
+# Generate site files
+_site/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
