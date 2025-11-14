@@ -3,13 +3,12 @@ import marimo
 __generated_with = "0.16.5"
 app = marimo.App(
     app_title="Fracture in rotating structure - Failure prediction",
-    layout_file="layouts/analysis_with_dimensionless_SIFs_nb.grid.json",
 )
 
 with app.setup:
     # Initialization code that runs before all other cells
     import marimo as mo
-    from sympy import symbols, exp, diff, cos, sin, roots, N, Eq, Rational, im, pi
+    from sympy import symbols, exp, diff, cos, sin, roots, N, Rational, im, pi
     from sympy import latex, sympify
 
 
@@ -230,12 +229,9 @@ def _(
     for i, t_sol in enumerate(t_sols):
         print(f"t_{i + 1} ≈ {N(t_sol)} seconds")
 
-
     # # Extract the failure time
     try:
-        valid_ts = [
-            N(t_sol) for t_sol in t_sols if im(N(t_sol)) == 0 and N(t_sol) >= 0
-        ]
+        valid_ts = [N(t_sol) for t_sol in t_sols if im(N(t_sol)) == 0 and N(t_sol) >= 0]
         t_failure = min(valid_ts)
     except:
         # If all the values are complex or negative, it means that the acceleration load is sufficient to break the beam at the very begining of the load.
