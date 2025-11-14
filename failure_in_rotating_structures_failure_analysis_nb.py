@@ -1,3 +1,8 @@
+# /// script
+# [tool.marimo.display]
+# theme = "dark"
+# ///
+
 import marimo
 
 __generated_with = "0.16.5"
@@ -147,7 +152,7 @@ def _():
         a_W=mo.ui.number(1 / 2),
         Lc_L=mo.ui.number(1 / 2),
         # Load
-        omega=mo.ui.text("900 * t"),
+        omega=mo.ui.text("10 * t"),
         alpha=mo.ui.number(0),
     )
     subs_values
@@ -235,6 +240,7 @@ def _(
         t_failure = min(valid_ts)
     except:
         # If all the values are complex or negative, it means that the acceleration load is sufficient to break the beam at the very begining of the load.
+        print("The initial load is sufficient for failure => t_failure = 0.")
         t_failure = 0
     subs[t] = t_failure
 
