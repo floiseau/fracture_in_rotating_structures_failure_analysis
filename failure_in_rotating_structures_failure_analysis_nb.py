@@ -46,6 +46,8 @@ def _(K1c, K1e, K2c, K2e, K3c, K3e):
         K_{{II}}^e &= {latex(K2e.simplify())}, \\
         K_{{III}}^e &= {latex(K3e.simplify())}.
     \end{{align}}
+
+    *Remark: Those expressions are valid for $L = 400/30 W$.*
     """
     )
     return
