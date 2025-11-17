@@ -13,7 +13,20 @@ app = marimo.App(
 with app.setup:
     # Initialization code that runs before all other cells
     import marimo as mo
-    from sympy import symbols, exp, diff, cos, sin, roots, N, Rational, im, pi
+    from sympy import (
+        symbols,
+        exp,
+        diff,
+        cos,
+        sin,
+        roots,
+        real_roots,
+        N,
+        Rational,
+        im,
+        pi,
+        plot_parametric,
+    )
     from sympy import latex, sympify
 
 
@@ -34,10 +47,6 @@ def _(K1c, K1e, K2c, K2e, K3c, K3e):
         K_{{II}}^e &= {latex(K2e.simplify())}, \\
         K_{{III}}^e &= {latex(K3e.simplify())}.
     \end{{align}}
-
-    ## Determination of failure time
-
-    First we define the different variables in our system.
     """
     )
     return
@@ -47,32 +56,15 @@ def _(K1c, K1e, K2c, K2e, K3c, K3e):
 def _():
     # Define time and its assumptions
     t = symbols("t", real=True, positive=True)
-
     # Declare the variables with LaTeX names
     Lc_L = symbols(r"\tilde{L}_c", real=True, positive=True)
     a_W = symbols(r"\tilde{a}", real=True, positive=True)
     rho, W, omega, domega, alpha, E, nu, G_c = symbols(
         r"rho W Omega \dot{\Omega} alpha E nu G_c", real=True, positive=True
     )
-
     # Define derived quantities
     mu = E / (2 * (1 - nu))
-    return E, G_c, Lc_L, W, a_W, alpha, domega, mu, nu, omega, rho, t
 
-
-@app.cell(hide_code=True)
-def _():
-    mo.md(
-        r"""
-    Then, we define the dimensionless SIFs and recombine them into the full SIFs.
-    Using the Irwin formula, the energy release rate $G$ is then determined.
-    """
-    )
-    return
-
-
-@app.cell
-def _(E, Lc_L, W, a_W, alpha, domega, mu, nu, omega, rho):
     # Define the dimensionless SIFs (all fractions as rationals)
     K1c_adim = (
         151
@@ -111,13 +103,42 @@ def _(E, Lc_L, W, a_W, alpha, domega, mu, nu, omega, rho):
     # Computation of the energy release rate from Irwin formula
     Ep = E / (1 - nu**2)
     G = (1 / Ep) * (K1**2 + K2**2) + K3**2 / (2 * mu)
-    return G, K1, K1c, K1e, K2, K2c, K2e, K3, K3c, K3e
+    return (
+        E,
+        G,
+        G_c,
+        K1,
+        K1c,
+        K1e,
+        K2,
+        K2c,
+        K2e,
+        K3,
+        K3c,
+        K3e,
+        Lc_L,
+        W,
+        a_W,
+        alpha,
+        domega,
+        nu,
+        omega,
+        rho,
+        t,
+    )
 
 
 @app.cell(hide_code=True)
 def _():
     mo.md(
-        r"""Finally, the failure time is given by Griffith criterion $G=G_c$. As the final expression of failure time depends on a lot of paramaters, and is not explicitly required, we directly substitute the parameters by there numerical values."""
+        rf"""
+    ## Determination of failure time
+
+    This first study is dedicated to the determination of failure time in the structure.
+    Failure time is given by Griffith criterion $G=G_c$.
+
+    To evaluate the symbolic expression, please select values for the parameters parameter in the following cell.
+    """
     )
     return
 
@@ -146,13 +167,13 @@ def _():
         rho=mo.ui.number(value=1200),
         E=mo.ui.number(value=3.2e9),
         nu=mo.ui.number(value=0.4, start=0.0, stop=0.5, step=0.01),
-        G_c=mo.ui.number(value=320),
+        G_c=mo.ui.number(value=220),
         # Geometry
         W=mo.ui.number(value=40e-3),
         a_W=mo.ui.number(value=0.5, start=0.2, stop=0.8, step=0.01),
-        Lc_L=mo.ui.number(value=0.2, start=0.2, stop=0.8, step=0.01),
+        Lc_L=mo.ui.number(value=0.5, start=0.2, stop=0.8, step=0.01),
         # Load
-        omega=mo.ui.text("200 * t"),
+        omega=mo.ui.text("10 * t"),
         alpha=mo.ui.number(value=0, start=-90, stop=90, step=1),
     )
     subs_values
@@ -224,11 +245,11 @@ def _(
     subs[alpha] *= pi / 180
 
     # Determine the failure time
-    failure_time_equation = (G - G_c).subs(subs).simplify()
-    print("The failure time equation (based on Griffith criterion) is:")
-    print(latex(failure_time_equation.simplify()))
+    failure_time_equation = G - G_c
+    # print("The failure time equation (based on Griffith criterion) is:")
+    # print(latex(failure_time_equation.simplify()))
 
-    sols = roots(failure_time_equation, t)
+    sols = roots(failure_time_equation.subs(subs).simplify(), t)
     t_sols = [t_sol.subs(subs) for t_sol in sols]
     print("\nThe possible failure times are:")
     for i, t_sol in enumerate(t_sols):
@@ -236,7 +257,9 @@ def _(
 
     # # Extract the failure time
     try:
-        valid_ts = [N(t_sol) for t_sol in t_sols if im(N(t_sol)) == 0 and N(t_sol) >= 0]
+        valid_ts = [
+            N(t_sol) for t_sol in t_sols if im(N(t_sol)) == 0 and N(t_sol) >= 0
+        ]
         t_failure = min(valid_ts)
     except:
         # If all the values are complex or negative, it means that the acceleration load is sufficient to break the beam at the very begining of the load.
@@ -270,6 +293,7 @@ def _(
         M12_failure,
         M13_failure,
         domega_failure,
+        failure_time_equation,
         omega_failure,
         subs,
         t_failure,
@@ -290,7 +314,7 @@ def _(
 ):
     mo.md(
         rf"""
-    Based on the previous calculations, we obtain:
+    Based on the selected paramters, we obtain:
 
     - the failure time :
         - $t_f = {t_failure:.3g}$ s,
@@ -339,6 +363,52 @@ def _(K1, K2, subs, t, t_failure):
     plt.grid(True)
     plt.legend()
     plt.gca()
+    return
+
+
+@app.cell(hide_code=True)
+def _():
+    domega_val = mo.md(
+        r"""
+    
+        ## Determination of failure velocity evolution with crack length
+
+        Let us consider the previous setup with the acceleration {domega} rad/s$^2$.
+        The objective is to determine, for the previously defined configuration, the evolution of the failure velocity for different crack length.
+
+        **The following cell takes some times to execute (around 1 min).**
+        """
+    ).batch(domega=mo.ui.number(value=200))
+    domega_val
+    return (domega_val,)
+
+
+@app.cell(disabled=True)
+def _(a_W, domega, domega_val, failure_time_equation, omega, subs, t):
+    subs_2 = subs.copy()
+    del subs_2[t]
+    del subs_2[omega]
+    del subs_2[a_W]
+    subs_2[domega] = domega_val["domega"].value
+
+    sols_omega = roots(failure_time_equation.subs(subs_2).simplify(), omega)
+    return (sols_omega,)
+
+
+@app.cell
+def _(a_W, sols_omega):
+    for sol_omega in sols_omega:
+        sol_omega_val = sol_omega.subs({a_W: 0.5})
+        if sol_omega_val.is_real and sol_omega_val > 0:
+            plot_parametric(
+                (a_W, sol_omega),
+                (a_W, 0.2, 0.8),
+                xlabel="$a/W$",
+                ylabel="$\Omega$ (rad/s$^2$)",
+                title="Evolution of failure velocity $\Omega$ with crack length $a/w$",
+                axis_center="auto",
+                xlim=(0.2, 0.8),
+            )
     return
 
 
