@@ -221,7 +221,7 @@ def _(
     subs = {str_to_var[key]: val for key, val in subs_values.value.items()}
     subs[omega] = sympify(subs[omega], locals={"t": t})
     subs[domega] = diff(subs[omega], t)
-    subs[alpha] *= 180 / pi
+    subs[alpha] *= pi / 180
 
     # Determine the failure time
     failure_time_equation = (G - G_c).subs(subs).simplify()
