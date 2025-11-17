@@ -236,7 +236,9 @@ def _(
 
     # # Extract the failure time
     try:
-        valid_ts = [N(t_sol) for t_sol in t_sols if im(N(t_sol)) == 0 and N(t_sol) >= 0]
+        valid_ts = [
+            N(t_sol) for t_sol in t_sols if im(N(t_sol)) == 0 and N(t_sol) >= 0
+        ]
         t_failure = min(valid_ts)
     except:
         # If all the values are complex or negative, it means that the acceleration load is sufficient to break the beam at the very begining of the load.
@@ -256,6 +258,10 @@ def _(
     K2_failure = K2.subs(subs)
     K3_failure = K3.subs(subs)
 
+    # Determine mode mixity at failure
+    M12_failure = K2_failure / K1_failure
+    M13_failure = K3_failure / K1_failure
+
     # TODO: Calculate the initial crack propagation angle.
     print("\nThen, we could predict the initial crack propagation angle.")
     return (
@@ -263,6 +269,8 @@ def _(
         K1_failure,
         K2_failure,
         K3_failure,
+        M12_failure,
+        M13_failure,
         domega_failure,
         omega_failure,
         subs,
@@ -276,6 +284,8 @@ def _(
     K1_failure,
     K2_failure,
     K3_failure,
+    M12_failure,
+    M13_failure,
     domega_failure,
     omega_failure,
     t_failure,
@@ -294,12 +304,13 @@ def _(
     - the SIFs at failure :
         - $K_{{I}} = {float(K1_failure):.3g}$ Pa.m$^{{1/2}}$
         - $K_{{II}} = {float(K2_failure):.3g}$ Pa.m$^{{1/2}}$
-        - $K_{{III}} = {float(K3_failure):.3G}$ Pa.m$^{{1/2}}$
+        - $K_{{III}} = {float(K3_failure):.3g}$ Pa.m$^{{1/2}}$
     - the mode mixities :
-        - $M_{{I}}^{{II}} = ...$
-        - $M_{{I}}^{{III}} = ...$
-    - the initial crack propagation angle :
-        - $\varphi = ...$
+        - $M_{{I}}^{{II}} = {float(M12_failure):.3g}$
+        - $M_{{I}}^{{III}} = {float(M13_failure):.3g}$
+    - the predictions of initial crack propagation angle :
+        - $\varphi_{{\mathrm{{PLS}}}} = ...$
+        - $\varphi_{{\mathrm{{MERR}}}} = ...$
     """
     )
     return
