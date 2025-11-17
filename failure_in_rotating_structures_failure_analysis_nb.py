@@ -144,7 +144,7 @@ def _():
     ).batch(
         # Material
         rho=mo.ui.number(value=1200),
-        E=mo.ui.number(value=3_200_000),
+        E=mo.ui.number(value=3.2e9),
         nu=mo.ui.number(value=0.4, start=0.0, stop=0.5, step=0.01),
         G_c=mo.ui.number(value=220),
         # Geometry
