@@ -3,8 +3,6 @@
 This repository provides an interactive analysis of fracture mechanics in rotating structures using **dimensionless Stress Intensity Factors (SIFs)**.
 The analysis is implemented as a **marimo notebook**, which is automatically deployed to [GitHub Pages](https://floiseau.github.io/fracture_in_rotating_structures_failure_analysis).
 
----
-
 ## How to Use
 
 ### Online Version
