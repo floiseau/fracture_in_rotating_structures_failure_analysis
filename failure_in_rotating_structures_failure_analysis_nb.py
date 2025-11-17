@@ -20,7 +20,6 @@ with app.setup:
         cos,
         sin,
         roots,
-        real_roots,
         N,
         Rational,
         im,
@@ -131,7 +130,7 @@ def _():
 @app.cell(hide_code=True)
 def _():
     mo.md(
-        rf"""
+        r"""
     ## Determination of failure time
 
     This first study is dedicated to the determination of failure time in the structure.
@@ -167,13 +166,13 @@ def _():
         rho=mo.ui.number(value=1200),
         E=mo.ui.number(value=3.2e9),
         nu=mo.ui.number(value=0.4, start=0.0, stop=0.5, step=0.01),
-        G_c=mo.ui.number(value=220),
+        G_c=mo.ui.number(value=320),
         # Geometry
         W=mo.ui.number(value=40e-3),
         a_W=mo.ui.number(value=0.5, start=0.2, stop=0.8, step=0.01),
-        Lc_L=mo.ui.number(value=0.5, start=0.2, stop=0.8, step=0.01),
+        Lc_L=mo.ui.number(value=0.2, start=0.2, stop=0.8, step=0.01),
         # Load
-        omega=mo.ui.text("10 * t"),
+        omega=mo.ui.text("200 * t"),
         alpha=mo.ui.number(value=0, start=-90, stop=90, step=1),
     )
     subs_values
@@ -257,9 +256,7 @@ def _(
 
     # # Extract the failure time
     try:
-        valid_ts = [
-            N(t_sol) for t_sol in t_sols if im(N(t_sol)) == 0 and N(t_sol) >= 0
-        ]
+        valid_ts = [N(t_sol) for t_sol in t_sols if im(N(t_sol)) == 0 and N(t_sol) >= 0]
         t_failure = min(valid_ts)
     except:
         # If all the values are complex or negative, it means that the acceleration load is sufficient to break the beam at the very begining of the load.
@@ -370,7 +367,7 @@ def _(K1, K2, subs, t, t_failure):
 def _():
     domega_val = mo.md(
         r"""
-    
+
         ## Determination of failure velocity evolution with crack length
 
         Let us consider the previous setup with the acceleration {domega} rad/s$^2$.
@@ -404,7 +401,7 @@ def _(a_W, sols_omega):
                 (a_W, sol_omega),
                 (a_W, 0.2, 0.8),
                 xlabel="$a/W$",
-                ylabel="$\Omega$ (rad/s$^2$)",
+                ylabel="$\Omega$ (rad/s)",
                 title="Evolution of failure velocity $\Omega$ with crack length $a/w$",
                 axis_center="auto",
                 xlim=(0.2, 0.8),
