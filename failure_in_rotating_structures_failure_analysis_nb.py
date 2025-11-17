@@ -116,9 +116,7 @@ def _(E, Lc_L, W, a_W, alpha, domega, mu, nu, omega, rho):
 
 @app.cell(hide_code=True)
 def _():
-    mo.md(
-        r"""Finally, the failure time is given by Griffith criterion $G=G_c$. As the final expression of failure time depends on a lot of paramaters, and is not explicitly required, we directly substitute the parameters by there numerical values."""
-    )
+    mo.md(r"""Finally, the failure time is given by Griffith criterion $G=G_c$. As the final expression of failure time depends on a lot of paramaters, and is not explicitly required, we directly substitute the parameters by there numerical values.""")
     return
 
 
@@ -143,17 +141,17 @@ def _():
         """
     ).batch(
         # Material
-        rho=mo.ui.number(1200),
-        E=mo.ui.number(3_200_000),
-        nu=mo.ui.number(0.4),
-        G_c=mo.ui.number(220),
+        rho=mo.ui.number(value=1200),
+        E=mo.ui.number(value=3_200_000),
+        nu=mo.ui.number(value=0.4),
+        G_c=mo.ui.number(value=220),
         # Geometry
-        W=mo.ui.number(40e-3),
-        a_W=mo.ui.number(1 / 2),
-        Lc_L=mo.ui.number(1 / 2),
+        W=mo.ui.number(value=40e-3),
+        a_W=mo.ui.number(value=0.5, start=0.2, stop=0.8, step=0.05),
+        Lc_L=mo.ui.number(value=0.5, start=0.2, stop=0.8, step=0.05),
         # Load
         omega=mo.ui.text("10 * t"),
-        alpha=mo.ui.number(0),
+        alpha=mo.ui.number(value=0),
     )
     subs_values
     return (subs_values,)
@@ -236,7 +234,9 @@ def _(
 
     # # Extract the failure time
     try:
-        valid_ts = [N(t_sol) for t_sol in t_sols if im(N(t_sol)) == 0 and N(t_sol) >= 0]
+        valid_ts = [
+            N(t_sol) for t_sol in t_sols if im(N(t_sol)) == 0 and N(t_sol) >= 0
+        ]
         t_failure = min(valid_ts)
     except:
         # If all the values are complex or negative, it means that the acceleration load is sufficient to break the beam at the very begining of the load.
@@ -330,11 +330,6 @@ def _(K1, K2, subs, t, t_failure):
     plt.grid(True)
     plt.legend()
     plt.gca()
-    return
-
-
-@app.cell
-def _():
     return
 
 
