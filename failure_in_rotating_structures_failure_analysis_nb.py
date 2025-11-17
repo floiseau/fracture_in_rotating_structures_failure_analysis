@@ -146,11 +146,11 @@ def _():
         rho=mo.ui.number(value=1200),
         E=mo.ui.number(value=3.2e9),
         nu=mo.ui.number(value=0.4, start=0.0, stop=0.5, step=0.01),
-        G_c=mo.ui.number(value=220),
+        G_c=mo.ui.number(value=320),
         # Geometry
-        W=mo.ui.number(value=40e-3),
+        W=mo.ui.number(value=30e-3),
         a_W=mo.ui.number(value=0.5, start=0.2, stop=0.8, step=0.01),
-        Lc_L=mo.ui.number(value=0.5, start=0.2, stop=0.8, step=0.01),
+        Lc_L=mo.ui.number(value=0.2, start=0.2, stop=0.8, step=0.01),
         # Load
         omega=mo.ui.text("10 * t"),
         alpha=mo.ui.number(value=0, start=-90, stop=90, step=1),
@@ -236,9 +236,7 @@ def _(
 
     # # Extract the failure time
     try:
-        valid_ts = [
-            N(t_sol) for t_sol in t_sols if im(N(t_sol)) == 0 and N(t_sol) >= 0
-        ]
+        valid_ts = [N(t_sol) for t_sol in t_sols if im(N(t_sol)) == 0 and N(t_sol) >= 0]
         t_failure = min(valid_ts)
     except:
         # If all the values are complex or negative, it means that the acceleration load is sufficient to break the beam at the very begining of the load.
