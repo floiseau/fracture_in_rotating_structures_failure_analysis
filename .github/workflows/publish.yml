@@ -1,34 +1,35 @@
 name: Deploy marimo notebook to GitHub Pages
-
 on:
   workflow_dispatch:
   push:
     branches: ["main"]
-
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
       - name: 🛒 Checkout repository
         uses: actions/checkout@v4
-
       - name: 🐍 Set up Python
         uses: actions/setup-python@v5
+      - name: 🗃️ Cache pip
+        uses: actions/cache@v3
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
 
       - name: 📦 Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install marimo sympy numpy matplotlib # Add other dependencies here if needed
-
+          pip install -r requirements.txt
       - name: 📄 Export notebook
         run: |
           marimo export html-wasm failure_in_rotating_structures_failure_analysis_nb.py -o _site/ --mode run
-
       - name: 📦 Upload Pages Artifact
         uses: actions/upload-pages-artifact@v3
         with:
           path: _site/
-
   deploy:
     needs: build
     runs-on: ubuntu-latest

@@ -1,0 +1,4 @@
+marimo
+sympy
+numpy
+matplotlib
