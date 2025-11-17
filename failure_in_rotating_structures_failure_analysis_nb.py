@@ -376,7 +376,7 @@ def _():
         Let us consider the previous setup with the acceleration {domega} rad/s$^2$.
         The objective is to determine, for the previously defined configuration, the evolution of the failure velocity for different crack length.
 
-        **The following cell takes some times to execute (around 1 min).**
+        **The following cell takes some times to execute (around 1 min), so it is disabled. Use the local version to enable it.**
         """
     ).batch(domega=mo.ui.number(value=200))
     domega_val
