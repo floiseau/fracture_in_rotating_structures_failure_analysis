@@ -148,11 +148,11 @@ def _():
         nu=mo.ui.number(value=0.4, start=0.0, stop=0.5, step=0.01),
         G_c=mo.ui.number(value=320),
         # Geometry
-        W=mo.ui.number(value=30e-3),
+        W=mo.ui.number(value=40e-3),
         a_W=mo.ui.number(value=0.5, start=0.2, stop=0.8, step=0.01),
         Lc_L=mo.ui.number(value=0.2, start=0.2, stop=0.8, step=0.01),
         # Load
-        omega=mo.ui.text("10 * t"),
+        omega=mo.ui.text("200 * t"),
         alpha=mo.ui.number(value=0, start=-90, stop=90, step=1),
     )
     subs_values
