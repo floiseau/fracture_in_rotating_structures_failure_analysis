@@ -24,9 +24,13 @@ with app.setup:
         Rational,
         im,
         pi,
-        plot_parametric,
+        plot,
+        latex,
+        sympify,
     )
-    from sympy import latex, sympify
+
+    import matplotlib.pyplot as plt
+    import numpy as np
 
 
 @app.cell(hide_code=True)
@@ -258,7 +262,9 @@ def _(
 
     # # Extract the failure time
     try:
-        valid_ts = [N(t_sol) for t_sol in t_sols if im(N(t_sol)) == 0 and N(t_sol) >= 0]
+        valid_ts = [
+            N(t_sol) for t_sol in t_sols if im(N(t_sol)) == 0 and N(t_sol) >= 0
+        ]
         t_failure = min(valid_ts)
     except:
         # If all the values are complex or negative, it means that the acceleration load is sufficient to break the beam at the very begining of the load.
@@ -339,9 +345,6 @@ def _(
 
 @app.cell(hide_code=True)
 def _(K1, K2, subs, t, t_failure):
-    import matplotlib.pyplot as plt
-    import numpy as np
-
     new_subs = {}
     new_subs.update(subs)
     if t in new_subs:
@@ -396,18 +399,40 @@ def _(a_W, domega, domega_val, failure_time_equation, omega, subs, t):
 
 @app.cell
 def _(a_W, sols_omega):
-    for sol_omega in sols_omega:
-        sol_omega_val = sol_omega.subs({a_W: 0.5})
-        if sol_omega_val.is_real and sol_omega_val > 0:
-            plot_parametric(
-                (a_W, sol_omega),
-                (a_W, 0.2, 0.8),
-                xlabel="$a/W$",
-                ylabel="$\Omega$ (rad/s)",
-                title="Evolution of failure velocity $\Omega$ with crack length $a/w$",
-                axis_center="auto",
-                xlim=(0.2, 0.8),
-            )
+    # Get the valid solution
+    final_sol_omega = next(
+        sol
+        for sol in sols_omega
+        if (sol_val := sol.subs({a_W: 0.5})).is_real and sol_val > 0
+    )
+
+    # Load the experimental results
+    data = np.genfromtxt("data/a_w_vs_omega_c.csv", delimiter=",", skip_header=1)
+    a_W_expe = data[:, 0]
+    omega_c_expe = data[:, 1]
+
+    # Plot the results
+    fig = plt.figure()
+    plt.title(r"Evolution of failure velocity $\Omega_c$ with crack length $a/W$")
+    plt.gca().scatter(a_W_expe, omega_c_expe, c="tab:blue")
+    p_Omega_c_vs_a_W = plot(
+        final_sol_omega,
+        (a_W, 0.2, 0.8),
+        fig=fig,
+        ax=plt.gca(),
+        c="tab:red",
+        xlabel="$a/W$",
+        ylabel=r"$\Omega_c$ (rad/s)",
+        xlim=(0.2, 0.8),
+        show=False,
+    )
+
+    p_Omega_c_vs_a_W.show()
+    return
+
+
+@app.cell
+def _():
     return
 
 
